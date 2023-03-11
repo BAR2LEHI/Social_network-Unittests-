@@ -79,7 +79,7 @@ class Comment(models.Model):
         related_name='comments',
         verbose_name='Author'
     )
-    text = models.CharField(
+    text = models.TextField(
         max_length=150,
         verbose_name='Text',
         help_text='Текст вашего комментария'
