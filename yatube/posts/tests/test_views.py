@@ -575,3 +575,17 @@ class TestFollow(TestCase):
         )
         context_unfollow = response_unfollow.context['page_obj']
         self.assertNotIn(post, context_unfollow)
+
+    def test_follow_yourself(self):
+        self.authorized_client.get(
+            reverse(
+                'posts:profile_follow',
+                kwargs={'username': TestFollow.user}
+            )
+        )
+        self.assertFalse(
+            Follow.objects.filter(
+                user=TestFollow.user,
+                author=TestFollow.user
+            ).exists()
+        )
