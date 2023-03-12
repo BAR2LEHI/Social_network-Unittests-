@@ -589,3 +589,28 @@ class TestFollow(TestCase):
                 author=TestFollow.user
             ).exists()
         )
+    
+    def test_follow_once(self):
+        self.authorized_client.get(
+            reverse(
+                'posts:profile_follow',
+                kwargs={'username': TestFollow.user_2}
+            )
+        )
+        self.assertTrue(
+            Follow.objects.filter(
+                user=TestFollow.user,
+                author=TestFollow.user_2
+            ).exists()
+        )
+        self.authorized_client.get(
+            reverse(
+                'posts:profile_follow',
+                kwargs={'username': TestFollow.user_2}
+            )
+        )
+        follow_count = Follow.objects.filter(
+            user=TestFollow.user,
+            author=TestFollow.user_2
+        ).count()
+        self.assertEqual(follow_count, 1)
