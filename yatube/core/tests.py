@@ -1,5 +1,6 @@
 from django.test import Client, TestCase
 from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
 
 
 User = get_user_model()
@@ -23,4 +24,6 @@ class TestCoreViews(TestCase):
         self.assertTemplateUsed(response, 'core/404.html')
 
     def test_template_403(self):
-        self.assertEqual('core/403_csrf.html', 'core/403_csrf.html')
+        def failure():
+            raise PermissionDenied()
+        self.assertTemplateUsed(failure(), 'core/403_csrf.html')
