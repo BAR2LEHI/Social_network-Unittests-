@@ -589,7 +589,7 @@ class TestFollow(TestCase):
                 author=TestFollow.user
             ).exists()
         )
-    
+
     def test_follow_once(self):
         self.authorized_client.get(
             reverse(
