@@ -64,9 +64,6 @@ class PostsPagesTest(TestCase):
             text='Третий текстовый пост',
             group=cls.group
         )
-        # Я понимаю, как это ужасно выглядит, но по-другому проблему
-        # с тестом test_post_image_context решить не смог,
-        # помощь в пачке не спасла, прошу совет:(
         sleep(0.5)
         cls.post_img = Post.objects.create(
             author=cls.user,
