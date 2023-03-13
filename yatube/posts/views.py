@@ -35,10 +35,9 @@ def profile(request, username):
     """Функция отображения профиля пользователя"""
     author = get_object_or_404(User, username=username)
     posts_list = author.posts.all()
-    user = request.user
-    following = False
-    if request.user.is_authenticated:
-        following = Follow.objects.filter(user=user, author=author).exists()
+    following = (request.user.is_authenticated 
+                 and Follow.objects.filter(user=request.user, 
+                                           author=author).exists())
     context = {
         'page_obj': paginate_page(request, posts_list),
         'author': author,
@@ -109,25 +108,18 @@ def add_comment(request, post_id):
 @login_required
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
-    exist = Follow.objects.filter(
+    if author != request.user:
+        Follow.objects.get_or_create(
         user=request.user,
         author=author
-    ).exists()
-    if exist:
-        return redirect('posts:profile', username)
-    if author != request.user:
-        Follow.objects.create(
-            user=request.user,
-            author=author
-        )
+    )
     return redirect('posts:profile', username)
 
 
 @login_required
 def follow_index(request):
     user = request.user
-    authors = user.follower.values_list('author', flat=True)
-    post_list = Post.objects.filter(author__id__in=authors)
+    post_list = Post.objects.filter(author__following__user=user)
     context = {
         'page_obj': paginate_page(request, post_list)
     }
