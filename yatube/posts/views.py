@@ -35,8 +35,8 @@ def profile(request, username):
     """Функция отображения профиля пользователя"""
     author = get_object_or_404(User, username=username)
     posts_list = author.posts.all()
-    following = (request.user.is_authenticated 
-                 and Follow.objects.filter(user=request.user, 
+    following = (request.user.is_authenticated
+                 and Follow.objects.filter(user=request.user,
                                            author=author).exists())
     context = {
         'page_obj': paginate_page(request, posts_list),
@@ -110,9 +110,9 @@ def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
     if author != request.user:
         Follow.objects.get_or_create(
-        user=request.user,
-        author=author
-    )
+            user=request.user,
+            author=author
+        )
     return redirect('posts:profile', username)
 
 
