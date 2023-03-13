@@ -1,6 +1,5 @@
 import shutil
 import tempfile
-from time import sleep
 
 from django import forms
 from django.conf import settings
@@ -64,13 +63,6 @@ class PostsPagesTest(TestCase):
             text='Третий текстовый пост',
             group=cls.group
         )
-        sleep(0.5)
-        cls.post_img = Post.objects.create(
-            author=cls.user,
-            text='Пост с картинкой',
-            group=cls.group,
-            image=cls.uploaded_2
-        )
         cls.template_and_page = {
             reverse('posts:index'): 'posts/index.html',
             reverse('posts:group_list',
@@ -97,6 +89,25 @@ class PostsPagesTest(TestCase):
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        self.image_2 = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
+        )
+        self.uploaded_2 = SimpleUploadedFile(
+            name='image2.gif',
+            content=self.image_2,
+            content_type='image/gif'
+        )
+        self.post_img = Post.objects.create(
+            author=self.user,
+            text='Пост с картинкой',
+            group=self.group,
+            image=self.uploaded_2
+        )
 
     def test_pages_use_correct_template(self):
         """Страницы используют корректные шаблоны"""
@@ -221,19 +232,19 @@ class PostsPagesTest(TestCase):
         response_profile = self.authorized_client.get(
             reverse(
                 'posts:profile',
-                kwargs={'username': PostsPagesTest.post_img.author}
+                kwargs={'username': self.post_img.author}
             )
         )
         response_group = self.guest_client.get(
             reverse(
                 'posts:group_list',
-                kwargs={'slug': PostsPagesTest.post_img.group.slug}
+                kwargs={'slug': self.post_img.group.slug}
             )
         )
         response_detail = self.guest_client.get(
             reverse(
                 'posts:post_detail',
-                kwargs={'post_id': PostsPagesTest.post_img.pk}
+                kwargs={'post_id': self.post_img.pk}
             )
         )
         last_post = Post.objects.latest('pub_date')
